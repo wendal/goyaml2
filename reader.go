@@ -38,20 +38,20 @@ func (y *yamlReader) ReadObject(minIndent int) (interface{}, error) {
 	line, err := y.NextLine()
 	if err != nil {
 		if err == io.EOF && line != "" {
-			log.Println("Read EOF , but still some data here")
+			//log.Println("Read EOF , but still some data here")
 		} else {
-			log.Println("ReadERR", err)
+			//log.Println("ReadERR", err)
 			return nil, err
 		}
 	}
 	y.lastLine = line
 	indent, str := getIndent(line)
 	if indent < minIndent {
-		log.Println("Current Indent Unexpect : ", str, indent, minIndent)
+		//log.Println("Current Indent Unexpect : ", str, indent, minIndent)
 		return nil, y.Error("Unexpect Indent", nil)
 	}
 	if indent > minIndent {
-		log.Println("Change minIndent from %d to %d", minIndent, indent)
+		//log.Println("Change minIndent from %d to %d", minIndent, indent)
 		minIndent = indent
 	}
 	switch str[0] {
@@ -67,7 +67,7 @@ func (y *yamlReader) ReadObject(minIndent int) (interface{}, error) {
 		}
 		return value, nil
 	}
-	log.Println("Read Objcet as Map", indent, str)
+	//log.Println("Read Objcet as Map", indent, str)
 
 	return y.ReadMap(minIndent)
 
@@ -148,7 +148,7 @@ func (y *yamlReader) ReadList(minIndent int) ([]interface{}, error) {
 
 func (y *yamlReader) ReadMap(minIndent int) (map[string]interface{}, error) {
 	_map := map[string]interface{}{}
-	log.Println("ReadMap", minIndent)
+	//log.Println("ReadMap", minIndent)
 OUT:
 	for {
 		line, err := y.NextLine()
@@ -156,7 +156,7 @@ OUT:
 			return _map, err
 		}
 		indent, str := getIndent(line)
-		log.Printf("Indent : %d, str = %s", indent, str)
+		//log.Printf("Indent : %d, str = %s", indent, str)
 		switch {
 		case indent < minIndent:
 			y.lastLine = line
@@ -169,12 +169,12 @@ OUT:
 			if err != nil {
 				return nil, err
 			}
-			log.Println("Key=", key, "value=", value)
+			//log.Println("Key=", key, "value=", value)
 			switch value {
 			case nil:
 				return nil, y.Error("Unexpect", nil)
 			case MAP_KEY_ONLY:
-				log.Println("KeyOnly, read inner Map", key)
+				//log.Println("KeyOnly, read inner Map", key)
 
 				//--------------------------------------
 				_line, err := y.NextLine()
@@ -194,10 +194,10 @@ OUT:
 				if _indent < minIndent {
 					return _map, nil
 				}
-				//log.Println("##>>", _indent, _str)
+				////log.Println("##>>", _indent, _str)
 				if _indent == minIndent {
 					if _str[0] == '-' {
-						log.Println("Read Same-Indent ListItem for Map")
+						//log.Println("Read Same-Indent ListItem for Map")
 						_list, err := y.ReadList(minIndent)
 						if _list != nil {
 							_map[key.(string)] = _list
@@ -213,7 +213,7 @@ OUT:
 					}
 				}
 				//--------------------------------------
-				log.Println("Read Map Item", _indent, _str)
+				//log.Println("Read Map Item", _indent, _str)
 
 				obj, err := y.ReadObject(_indent)
 				if obj != nil {
@@ -226,7 +226,7 @@ OUT:
 				_map[key.(string)] = value
 			}
 		default:
-			log.Println("Bad", indent, str)
+			//log.Println("Bad", indent, str)
 			return nil, y.Error("Bad Indent\n"+line, nil)
 		}
 	}
@@ -239,7 +239,7 @@ func (y *yamlReader) NextLine() (line string, err error) {
 	if y.lastLine != "" {
 		line = y.lastLine
 		y.lastLine = ""
-		log.Println("Return lastLine", line)
+		//log.Println("Return lastLine", line)
 		return
 	}
 	for {
@@ -256,10 +256,10 @@ func (y *yamlReader) NextLine() (line string, err error) {
 		if line == "" {
 			continue
 		}
-		log.Println("Return Line", line)
+		//log.Println("Return Line", line)
 		return
 	}
-	log.Println("Impossbible : " + line)
+	//log.Println("Impossbible : " + line)
 	return // impossbile!
 }
 
@@ -305,7 +305,7 @@ func (y *yamlReader) asMapKeyValue(str string) (key interface{}, val interface{}
 	case "{":
 		_map := map[string]interface{}{}
 		for i := 3; i < len(tokens)-1; i += 4 {
-			log.Println(">>>", i, tokens[i])
+			//log.Println(">>>", i, tokens[i])
 			if i > len(tokens)-2 {
 				return "", nil, y.Error("Unexpect "+str, nil)
 			}
@@ -323,7 +323,7 @@ func (y *yamlReader) asMapKeyValue(str string) (key interface{}, val interface{}
 		}
 		return key, _map, nil
 	}
-	log.Println(str, tokens)
+	//log.Println(str, tokens)
 	return "", nil, y.Error("Unexpect "+str, nil)
 }
 
@@ -360,12 +360,12 @@ func splitToken(str string) (tokens []interface{}) {
 			}
 			lastPos = i + 1
 		case '\'':
-			log.Println("Scan End of String")
+			//log.Println("Scan End of String")
 			i++
 			start := i
 			for ; i < len(str); i++ {
 				if str[i] == '\'' {
-					log.Println("Found End of String", start, i)
+					//log.Println("Found End of String", start, i)
 					break
 				}
 			}
@@ -383,7 +383,7 @@ func splitToken(str string) (tokens []interface{}) {
 			lastPos = i + 1
 		}
 	}
-	//log.Println("last", lastPos)
+	////log.Println("last", lastPos)
 	if lastPos < len(str) {
 		tokens = append(tokens, str[lastPos:])
 	}
