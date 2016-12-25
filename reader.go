@@ -248,7 +248,7 @@ func (y *yamlReader) NextLine() (line string, err error) {
 		if err != nil {
 			return
 		}
-		if strings.HasPrefix(line, "---") || strings.HasPrefix(line, "#") {
+		if strings.HasPrefix(line, "---") || strings.HasPrefix(strings.TrimLeft(line, "\t "), "#") {
 			continue
 		}
 
